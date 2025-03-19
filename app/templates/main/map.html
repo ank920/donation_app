@@ -1,0 +1,871 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+.map-container {
+    padding: 2rem 0;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.map-header {
+    background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 2rem 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.map-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.1;
+}
+
+.map-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    animation: slideIn 0.8s ease-out;
+}
+
+.map-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    animation: slideIn 0.8s ease-out 0.2s backwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#map {
+    height: 70vh;
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#map:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.map-controls {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.5s ease-out 0.4s backwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.map-controls .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.map-controls .form-control:focus {
+    border-color: #000DFF;
+    box-shadow: 0 0 0 0.2rem rgba(0, 13, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-locate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #e3f2fd;
+    color: #1976d2;
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-locate:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.donation-popup {
+    max-width: 250px;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.donation-popup h5 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.donation-popup p {
+    color: #666;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    font-size: 0.85rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.donation-popup ul {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.donation-popup li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    color: #555;
+    padding: 0.25rem;
+}
+
+.donation-popup li i {
+    color: #666;
+    width: 15px;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.donation-popup .btn {
+    width: 100%;
+    padding: 0.4rem;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.donation-popup .btn-primary {
+    background: #1e88e5;
+    border: none;
+}
+
+.donation-popup .btn-primary:hover {
+    background: #1976d2;
+    transform: translateY(-1px);
+}
+
+.donation-popup .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.donation-popup .status-badge.available {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.donation-popup .status-badge.reserved {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.donation-popup .status-badge i {
+    font-size: 0.8rem;
+}
+
+.donation-popup .donation-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #fafafa;
+    border-radius: 10px;
+}
+
+.donation-popup .meta-item {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem;
+    border-right: 1px solid #eeeeee;
+}
+
+.donation-popup .meta-item:last-child {
+    border-right: none;
+}
+
+.donation-popup .meta-label {
+    font-size: 0.75rem;
+    color: #757575;
+    margin-bottom: 0.25rem;
+}
+
+.donation-popup .meta-value {
+    font-size: 0.9rem;
+    color: #212121;
+    font-weight: 600;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #000DFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+.current-location-pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.current-location-pin i {
+    color: #ff4757;
+    font-size: 35px;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+    transform-origin: bottom center;
+    animation: pinBounce 1s ease-in-out infinite;
+}
+
+@keyframes pinBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.1);
+    }
+}
+
+.search-marker i {
+    color: #1e90ff;
+    font-size: 25px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.custom-marker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-marker i {
+    color: #4169E1;
+    font-size: 30px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.leaflet-popup-content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+}
+
+.leaflet-popup-tip {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.donation-popup {
+    padding: 0.5rem;
+}
+
+.donation-popup h5 {
+    color: #2563eb;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.donation-popup p {
+    color: #4b5563;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.donation-popup ul {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 8px;
+}
+
+.donation-popup ul li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.donation-popup ul li i {
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+.donation-popup .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    border: none;
+    width: 100%;
+    padding: 0.6rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.donation-popup .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.donation-popup .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.donation-popup .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.3);
+}
+
+.donation-popup .button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.donation-popup {
+    min-width: 300px;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+}
+
+.donation-header {
+    padding: 15px;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    position: relative;
+}
+
+.donation-header h5 {
+    margin: 8px 0 0 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    backdrop-filter: blur(5px);
+}
+
+.donation-popup p {
+    padding: 15px;
+    margin: 0;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.donation-meta {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.meta-item i {
+    color: #2563eb;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+}
+
+.meta-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.meta-value {
+    font-size: 0.95rem;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.donation-popup .btn {
+    margin: 0 15px 15px;
+    width: calc(100% - 30px);
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    text-decoration: none;
+}
+
+.donation-popup .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.donation-popup .btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.donation-popup .btn:hover i {
+    transform: translateX(3px);
+}
+
+/* Override Leaflet's default popup styles */
+.leaflet-popup-content-wrapper {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    width: auto !important;
+}
+
+.leaflet-popup-tip {
+    background: #2563eb;
+}
+
+.leaflet-popup-close-button {
+    color: white !important;
+    font-size: 20px !important;
+    padding: 5px 10px !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="map-container">
+    <div class="map-header">
+        <div class="container">
+            <h1><i class="fas fa-map-marked-alt me-3"></i>Available Donations Map</h1>
+            <p>Find food donations near you and make a difference in your community</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="map-controls">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchAddress" placeholder="Enter an address to search">
+                        <button class="btn-locate" id="searchBtn" onclick="searchLocation()">
+                            <i class="fas fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <button class="btn-locate" id="getCurrentLocation">
+                        <i class="fas fa-location-arrow"></i>Use My Location
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="position-relative">
+            <div id="map"></div>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let map = null;
+    let markers = [];
+    let currentLocationMarker = null;
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    // Create popup content for donation markers
+    function createPopupContent(donation) {
+        const formattedDate = new Date(donation.expiry_time).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        return `
+            <div class="donation-popup">
+                <div class="donation-header">
+                    <span class="category-badge">${donation.category}</span>
+                    <h5>${donation.title}</h5>
+                </div>
+                <p>${donation.description}</p>
+                <div class="donation-meta">
+                    <div class="meta-item">
+                        <i class="bi bi-box-seam"></i>
+                        <span class="meta-label">Quantity</span>
+                        <span class="meta-value">${donation.quantity}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="bi bi-clock"></i>
+                        <span class="meta-label">Expires</span>
+                        <span class="meta-value">${formattedDate}</span>
+                    </div>
+                </div>
+                <a href="/donations/view/${donation.id}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle"></i>
+                    View Details
+                </a>
+            </div>
+        `;
+    }
+    
+    // Initialize the map
+    function initMap() {
+        map = L.map('map').setView([20.5937, 78.9629], 5);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.zoomControl.setPosition('topright');
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    map.setView([latitude, longitude], 13);
+                    
+                    if (currentLocationMarker) {
+                        map.removeLayer(currentLocationMarker);
+                    }
+                    
+                    currentLocationMarker = L.marker([latitude, longitude], {
+                        icon: L.divIcon({
+                            className: 'current-location-pin',
+                            html: '<i class="bi bi-geo-alt-fill"></i>',
+                            iconSize: [35, 35],
+                            iconAnchor: [17, 35]
+                        })
+                    }).addTo(map);
+                },
+                error => {
+                    console.error('Geolocation error:', error);
+                }
+            );
+        }
+    }
+
+    // Show/hide loading overlay
+    function toggleLoading(show) {
+        loadingOverlay.style.display = show ? 'flex' : 'none';
+    }
+
+    // Clear existing markers
+    function clearMarkers() {
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+    }
+
+    // Load and display donations
+    function loadDonations() {
+        toggleLoading(true);
+        
+        fetch('/api/donations')
+            .then(response => response.json())
+            .then(donations => {
+                clearMarkers();
+                donations.forEach(donation => {
+                    if (donation.latitude && donation.longitude) {
+                        const marker = L.marker([donation.latitude, donation.longitude], {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<i class="bi bi-geo-alt-fill"></i>',
+                                iconSize: [40, 40],
+                                iconAnchor: [20, 40]
+                            })
+                        }).addTo(map);
+                        
+                        const popupContent = createPopupContent(donation);
+                        
+                        marker.bindPopup(popupContent);
+                        markers.push(marker);
+                    }
+                });
+
+                // Fit map to show all markers
+                if (markers.length > 0) {
+                    const group = new L.featureGroup(markers);
+                    map.fitBounds(group.getBounds());
+                }
+                
+                toggleLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching donations:', error);
+                alert('Failed to load donation locations. Please try again later.');
+                toggleLoading(false);
+            });
+    }
+
+    // Handle location search
+    window.searchLocation = function() {
+        const address = document.getElementById('searchAddress').value.trim();
+        if (!address) {
+            alert('Please enter an address to search.');
+            return;
+        }
+
+        toggleLoading(true);
+        
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const { lat, lon } = data[0];
+                    map.setView([parseFloat(lat), parseFloat(lon)], 13);
+                    
+                    // Add a temporary marker for the searched location
+                    const searchMarker = L.marker([parseFloat(lat), parseFloat(lon)], {
+                        icon: L.divIcon({
+                            className: 'search-marker',
+                            html: '<i class="fas fa-search-location"></i>',
+                            iconSize: [25, 25]
+                        })
+                    }).addTo(map);
+                    
+                    searchMarker.bindPopup('Searched location').openPopup();
+                    
+                    // Remove the marker after 5 seconds
+                    setTimeout(() => map.removeLayer(searchMarker), 5000);
+                } else {
+                    alert('Location not found. Please try a different address.');
+                }
+                toggleLoading(false);
+            })
+            .catch(error => {
+                console.error('Error searching location:', error);
+                alert('Error searching location. Please try again.');
+                toggleLoading(false);
+            });
+    }
+
+    // Handle getting current location
+    document.getElementById('getCurrentLocation').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            toggleLoading(true);
+            
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    map.setView([latitude, longitude], 13);
+                    
+                    if (currentLocationMarker) {
+                        map.removeLayer(currentLocationMarker);
+                    }
+                    
+                    currentLocationMarker = L.marker([latitude, longitude], {
+                        icon: L.divIcon({
+                            className: 'current-location-pin',
+                            html: '<i class="bi bi-geo-alt-fill"></i>',
+                            iconSize: [35, 35],
+                            iconAnchor: [17, 35]
+                        })
+                    }).addTo(map);
+                    
+                    toggleLoading(false);
+                },
+                error => {
+                    console.error('Geolocation error:', error);
+                    alert('Could not get your location. Please try searching for an address instead.');
+                    toggleLoading(false);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by your browser.');
+        }
+    });
+
+    // Handle enter key in search input
+    document.getElementById('searchAddress').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchLocation();
+        }
+    });
+
+    // Initialize map and load donations
+    initMap();
+    loadDonations();
+
+    // Add this function for handling donation deletion
+    window.deleteDonation = function(donationId) {
+        if (confirm('Are you sure you want to delete this donation?')) {
+            fetch(`/donations/delete/${donationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Remove the marker from the map
+                    markers[donationId].remove();
+                    delete markers[donationId];
+                    alert('Donation deleted successfully');
+                } else {
+                    alert(data.error || 'Failed to delete donation');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the donation');
+            });
+        }
+    }
+});
+</script>
+{% endblock %} 

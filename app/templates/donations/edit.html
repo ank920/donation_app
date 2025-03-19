@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    #map {
+        height: 300px;
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 4px;
+    }
+    .location-feedback {
+        margin-top: 5px;
+        display: none;
+    }
+    .category-specific-fields {
+        display: none;
+    }
+    .expiry-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        border: 1px solid #dee2e6;
+        display: none;
+        transition: all 0.3s ease;
+    }
+    .expiry-section h5 {
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .expiry-section .form-control {
+        border-color: #dee2e6;
+    }
+    .expiry-section .form-control:focus {
+        border-color: #1e90ff;
+        box-shadow: 0 0 0 0.2rem rgba(30,144,255,0.25);
+    }
+    .expiry-section .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    .expiry-section small {
+        color: #6c757d;
+        font-style: italic;
+    }
+    .expiry-section.has-error {
+        background: #fff8f8;
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-0">Edit Donation</h1>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" id="donationForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Category Selection -->
+                    <div class="mb-3">
+                        {{ form.category.label(class="form-label") }}
+                        {{ form.category(class="form-control" + (" is-invalid" if form.category.errors else "")) }}
+                        {% for error in form.category.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                        {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3) }}
+                        {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="mb-3">
+                        {{ form.quantity.label(class="form-label") }}
+                        {{ form.quantity(class="form-control" + (" is-invalid" if form.quantity.errors else "")) }}
+                        {% for error in form.quantity.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Condition -->
+                    <div class="mb-3">
+                        {{ form.condition.label(class="form-label") }}
+                        {{ form.condition(class="form-control" + (" is-invalid" if form.condition.errors else "")) }}
+                        {% for error in form.condition.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Contact Phone -->
+                    <div class="mb-3">
+                        {{ form.contact_phone.label(class="form-label") }}
+                        {{ form.contact_phone(class="form-control" + (" is-invalid" if form.contact_phone.errors else ""), placeholder="Enter your contact phone number") }}
+                        {% for error in form.contact_phone.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <small class="form-text text-muted">This number will be used for donation coordination</small>
+                    </div>
+
+                    <!-- Category-specific fields -->
+                    <!-- Food Type -->
+                    <div class="mb-3 category-specific-fields" id="food-fields">
+                        {{ form.food_type.label(class="form-label") }}
+                        {{ form.food_type(class="form-select" + (" is-invalid" if form.food_type.errors else "")) }}
+                        {% for error in form.food_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pet Fields -->
+                    <div class="mb-3 category-specific-fields" id="pet-fields">
+                        {{ form.pet_type.label(class="form-label") }}
+                        {{ form.pet_type(class="form-select" + (" is-invalid" if form.pet_type.errors else "")) }}
+                        {% for error in form.pet_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        
+                        <div class="mt-3">
+                            {{ form.pet_age.label(class="form-label") }}
+                            {{ form.pet_age(class="form-control" + (" is-invalid" if form.pet_age.errors else ""), type="number") }}
+                            {% for error in form.pet_age.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Book Fields -->
+                    <div class="mb-3 category-specific-fields" id="book-fields">
+                        {{ form.book_type.label(class="form-label") }}
+                        {{ form.book_type(class="form-select" + (" is-invalid" if form.book_type.errors else "")) }}
+                        {% for error in form.book_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Medical Fields -->
+                    <div class="mb-3 category-specific-fields" id="medical-fields">
+                        {{ form.medical_type.label(class="form-label") }}
+                        {{ form.medical_type(class="form-select" + (" is-invalid" if form.medical_type.errors else "")) }}
+                        {% for error in form.medical_type.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Expiry Time Section -->
+                    <div class="expiry-section" id="expiry-section">
+                        <h5>
+                            <i class="fas fa-calendar"></i>
+                            Expiry Date & Time
+                        </h5>
+                        <div class="mb-3">
+                            {{ form.expiry_time.label(class="form-label") }}
+                            {{ form.expiry_time(class="form-control" + (" is-invalid" if form.expiry_time.errors else ""),
+                                              type="datetime-local",
+                                              min=datetime.now().strftime('%Y-%m-%dT%H:%M'),
+                                              placeholder="Select expiry date and time") }}
+                            {% for error in form.expiry_time.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                Please specify when this item will expire (date and time)
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Location Section -->
+                    <div class="mb-3">
+                        {{ form.pickup_location.label(class="form-label") }}
+                        <div class="input-group">
+                            {{ form.pickup_location(class="form-control" + (" is-invalid" if form.pickup_location.errors else ""), id="addressInput") }}
+                            <button type="button" class="btn btn-primary" id="geocodeBtn">Locate Address</button>
+                        </div>
+                        {% for error in form.pickup_location.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <div class="alert alert-info location-feedback" id="locationFeedback"></div>
+                        <small class="form-text text-muted">Enter an address and click "Locate Address", or click directly on the map</small>
+                        <div id="map"></div>
+                        {{ form.latitude(type="hidden", id="latitudeInput") }}
+                        {{ form.longitude(type="hidden", id="longitudeInput") }}
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary", value="Save Changes") }}
+                        <a href="{{ url_for('donations.view', id=donation.id) }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let map = null;
+    let marker = null;
+    const defaultLat = {{ donation.latitude or 20.5937 }};
+    const defaultLng = {{ donation.longitude or 78.9629 }};
+    
+    // Initialize the map
+    function initMap() {
+        map = L.map('map').setView([defaultLat, defaultLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add initial marker if coordinates exist
+        if (defaultLat && defaultLng) {
+            updateMarker(defaultLat, defaultLng);
+        }
+
+        // Add click handler to map
+        map.on('click', function(e) {
+            updateMarker(e.latlng.lat, e.latlng.lng);
+            reverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    // Update marker position and form inputs
+    function updateMarker(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                updateMarker(pos.lat, pos.lng);
+                reverseGeocode(pos.lat, pos.lng);
+            });
+        }
+        
+        document.getElementById('latitudeInput').value = lat;
+        document.getElementById('longitudeInput').value = lng;
+        map.setView([lat, lng], map.getZoom());
+    }
+
+    // Geocode address to coordinates
+    function geocodeAddress() {
+        const address = document.getElementById('addressInput').value;
+        const feedback = document.getElementById('locationFeedback');
+        
+        if (!address) {
+            feedback.textContent = 'Please enter an address first.';
+            feedback.style.display = 'block';
+            return;
+        }
+
+        feedback.textContent = 'Locating address...';
+        feedback.style.display = 'block';
+        
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const { lat, lon } = data[0];
+                    updateMarker(parseFloat(lat), parseFloat(lon));
+                    feedback.textContent = 'Location found!';
+                    feedback.className = 'alert alert-success location-feedback';
+                } else {
+                    feedback.textContent = 'Location not found. Please try a different address or click on the map.';
+                    feedback.className = 'alert alert-danger location-feedback';
+                }
+            })
+            .catch(error => {
+                console.error('Geocoding error:', error);
+                feedback.textContent = 'Error finding location. Please try again or click on the map.';
+                feedback.className = 'alert alert-danger location-feedback';
+            });
+    }
+
+    // Reverse geocode coordinates to address
+    function reverseGeocode(lat, lng) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.display_name) {
+                    document.getElementById('addressInput').value = data.display_name;
+                }
+            })
+            .catch(error => console.error('Reverse geocoding error:', error));
+    }
+
+    // Initialize map
+    initMap();
+
+    // Add click handler for geocode button
+    document.getElementById('geocodeBtn').addEventListener('click', geocodeAddress);
+
+    // Handle category changes
+    const categorySelect = document.querySelector('#category');
+    const foodFields = document.querySelector('#food-fields');
+    const petFields = document.querySelector('#pet-fields');
+    const bookFields = document.querySelector('#book-fields');
+    const medicalFields = document.querySelector('#medical-fields');
+    const expirySection = document.querySelector('#expiry-section');
+
+    function updateFields() {
+        const selectedCategory = categorySelect.value;
+        
+        // Hide all category-specific fields first
+        foodFields.style.display = 'none';
+        petFields.style.display = 'none';
+        bookFields.style.display = 'none';
+        medicalFields.style.display = 'none';
+        expirySection.style.display = 'none';
+
+        // Show the fields for the selected category
+        switch(selectedCategory) {
+            case 'food':
+                foodFields.style.display = 'block';
+                expirySection.style.display = 'block';  // Always show expiry for food
+                break;
+            case 'pets':
+                petFields.style.display = 'block';
+                break;
+            case 'books':
+                bookFields.style.display = 'block';
+                break;
+            case 'medical':
+                medicalFields.style.display = 'block';
+                // Check medical type
+                const medicalType = document.querySelector('#medical_type').value;
+                if (medicalType === 'supplies' || medicalType === 'medicines') {
+                    expirySection.style.display = 'block';
+                }
+                break;
+        }
+    }
+
+    // Initial update
+    updateFields();
+    
+    // Listen for changes in category
+    categorySelect.addEventListener('change', updateFields);
+
+    // Listen for changes in medical type
+    document.querySelector('#medical_type').addEventListener('change', function() {
+        if (categorySelect.value === 'medical') {
+            const medicalType = this.value;
+            expirySection.style.display = (medicalType === 'supplies' || medicalType === 'medicines') ? 'block' : 'none';
+        }
+    });
+
+    // Add submit handler to validate location and expiry time
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+        const lat = document.getElementById('latitudeInput').value;
+        const lng = document.getElementById('longitudeInput').value;
+        const category = categorySelect.value;
+        const medicalType = document.querySelector('#medical_type').value;
+        
+        if (!lat || !lng) {
+            e.preventDefault();
+            alert('Please select a location on the map or use the "Locate Address" button.');
+            return;
+        }
+
+        // Validate expiry time for food and medical supplies/medicines
+        const needsExpiry = category === 'food' || 
+                          (category === 'medical' && 
+                           (medicalType === 'supplies' || medicalType === 'medicines'));
+                           
+        if (needsExpiry && !document.querySelector('#expiry_time').value) {
+            e.preventDefault();
+            alert('Please set an expiry time for this type of donation.');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %} 

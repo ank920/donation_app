@@ -1,0 +1,678 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        min-height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+                    url("{{ url_for('static', filename='img/larm-rmah-AEaTUnvneik-unsplash.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        overflow: hidden;
+        padding: 100px 0;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 1s ease forwards;
+        padding: 2rem;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        background: linear-gradient(45deg, #fff, #f0f0f0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+
+    .hero-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #fff, transparent);
+        animation: lineWidth 2s ease-in-out infinite;
+    }
+
+    .hero-subtitle {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        color: #f0f0f0;
+        font-weight: 300;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 2.5rem;
+    }
+
+    .hero-btn {
+        padding: 1rem 2.5rem;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        font-weight: 500;
+    }
+
+    .hero-btn.btn-light {
+        background: rgba(255, 255, 255, 0.9);
+        color: #1e90ff;
+    }
+
+    .hero-btn.btn-outline-light {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        color: white;
+    }
+
+    .hero-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: all 0.5s ease;
+    }
+
+    .hero-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-btn:hover::before {
+        left: 100%;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 100px 0;
+        background: #f8f9fa;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .feature-card.animate-visible {
+        animation: fadeInUp 1s ease forwards;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        background: linear-gradient(135deg, #1e90ff, #4169E1);
+    }
+
+    /* Statistics Section */
+    .stats-section {
+        padding: 80px 0;
+        background: white;
+        position: relative;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 2rem;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .stat-card.animate-visible {
+        animation: fadeInUp 1s ease forwards;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e90ff;
+        margin-bottom: 1rem;
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Enhanced Gallery Section Styles */
+    .gallery-section {
+        padding: 100px 0;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .gallery-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(30,144,255,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(65,105,225,0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    .gallery-item {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        background: white;
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .gallery-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        padding: 2rem;
+        color: white;
+        transform: translateY(100%);
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gallery-item:hover .gallery-overlay {
+        transform: translateY(0);
+    }
+
+    .gallery-overlay h4 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .gallery-overlay p {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .donate-section {
+        text-align: center;
+        margin-top: 4rem;
+        padding: 2rem;
+        background: rgba(255,255,255,0.9);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .main-donate-btn {
+        padding: 1.2rem 3rem;
+        font-size: 1.4rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, #1e90ff, #4169E1);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(30,144,255,0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-donate-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: all 0.5s ease;
+    }
+
+    .main-donate-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(30,144,255,0.4);
+    }
+
+    .main-donate-btn:hover::before {
+        left: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .gallery-grid {
+            grid-template-columns: 1fr;
+            padding: 1rem;
+        }
+        
+        .gallery-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .main-donate-btn {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes lineWidth {
+        0%, 100% { width: 100px; opacity: 0.5; }
+        50% { width: 200px; opacity: 1; }
+    }
+
+    /* Animated Background Pattern */
+    .hero-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+            linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        animation: patternMove 20s linear infinite;
+        opacity: 0.1;
+    }
+
+    @keyframes patternMove {
+        0% { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+        100% { background-position: 20px 20px, 20px 30px, 30px 10px, 10px 20px; }
+    }
+
+    /* Floating Particles */
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .particle {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        pointer-events: none;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    @keyframes particleFloat {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-100px) scale(0); opacity: 0; }
+    }
+
+    /* Floating Button */
+    .btn-floating {
+        position: relative;
+        padding: 1rem 2.5rem;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #1e90ff, #4169E1);
+        color: white;
+        border: none;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-floating:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(30,144,255,0.3);
+    }
+
+    .btn-particles span {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(255,255,255,0.5);
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        animation: particleFloat 2s infinite;
+    }
+
+    .btn-particles span:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .btn-particles span:nth-child(2) { left: 40%; animation-delay: 0.4s; }
+    .btn-particles span:nth-child(3) { left: 60%; animation-delay: 0.8s; }
+    .btn-particles span:nth-child(4) { left: 90%; animation-delay: 1.2s; }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        .hero-subtitle {
+            font-size: 1.3rem;
+        }
+        .hero-buttons {
+            flex-direction: column;
+        }
+        .hero-btn {
+            width: 100%;
+        }
+        .feature-card {
+            margin-bottom: 2rem;
+        }
+        .particle {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-pattern"></div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title" data-aos="fade-down">Make a Difference Through Giving</h1>
+            <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">Join our community of donors and recipients to create positive change in society</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn hero-btn btn-light" data-aos="fade-right" data-aos-delay="400">
+                    Get Started
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn hero-btn btn-outline-light" data-aos="fade-left" data-aos-delay="400">
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Our Platform?</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <h3>Easy Donations</h3>
+                    <p>Simple and intuitive process to donate items to those in need</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <h3>Local Impact</h3>
+                    <p>Connect with organizations and individuals in your community</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3>Secure Platform</h3>
+                    <p>Safe and verified donation process with real-time tracking</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Items Donated</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Partner Organizations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Gallery Section -->
+<section class="gallery-section">
+    <div class="container">
+        <h2 class="text-center mb-5" data-aos="fade-up">Making a Difference Through Donations</h2>
+        
+        <div class="gallery-grid">
+            <div class="gallery-item" data-aos="fade-up">
+                <img src="{{ url_for('static', filename='img/megan-thomas-xMh_ww8HN_Q-unsplash.jpg') }}" alt="Food Donation">
+                <div class="gallery-overlay">
+                    <h4>Food Donations</h4>
+                    <p>Fresh and packaged food for those in need</p>
+                </div>
+            </div>
+            
+            <div class="gallery-item" data-aos="fade-up">
+                <img src="{{ url_for('static', filename='img/pet.jpg') }}" alt="Pet Adoption">
+                <div class="gallery-overlay">
+                    <h4>Pet Adoption</h4>
+                    <p>Find loving homes for pets</p>
+                </div>
+            </div>
+            
+            <div class="gallery-item" data-aos="fade-up">
+                <img src="{{ url_for('static', filename='img/medicine.jpg') }}" alt="Medical Supplies">
+                <div class="gallery-overlay">
+                    <h4>Medical Supplies</h4>
+                    <p>Essential medical equipment and supplies</p>
+                </div>
+            </div>
+            
+            <div class="gallery-item" data-aos="fade-up">
+                <img src="{{ url_for('static', filename='img/toy.jpg') }}" alt="Toys">
+                <div class="gallery-overlay">
+                    <h4>Toys & Games</h4>
+                    <p>Bringing joy to children</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="donate-section" data-aos="fade-up">
+            <a href="{{ url_for('auth.register') }}" class="main-donate-btn">
+                <i class="bi bi-heart-fill me-2"></i> Start Donating Today
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+        duration: 1200,
+        once: true,
+        offset: 100,
+        easing: 'ease-out-cubic'
+    });
+
+    // Enhanced particle animation
+    const particles = document.querySelectorAll('.particle');
+    
+    function animateParticles() {
+        particles.forEach((particle, index) => {
+            // Random initial position
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            // Random size
+            const size = Math.random() * 4 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random animation duration
+            const duration = Math.random() * 10 + 5;
+            particle.style.animation = `float${index % 5 + 1} ${duration}s infinite`;
+        });
+    }
+
+    // Initial animation
+    animateParticles();
+
+    // Parallax effect for hero section
+    const heroSection = document.querySelector('.hero-section');
+    const heroContent = document.querySelector('.hero-content');
+
+    window.addEventListener('scroll', () => {
+        const scroll = window.pageYOffset;
+        heroSection.style.backgroundPositionY = `${scroll * 0.5}px`;
+        heroContent.style.transform = `translateY(${scroll * 0.3}px)`;
+    });
+
+    // Mouse move effect for particles
+    document.addEventListener('mousemove', (e) => {
+        const { clientX, clientY } = e;
+        const moveX = (clientX - window.innerWidth / 2) * 0.05;
+        const moveY = (clientY - window.innerHeight / 2) * 0.05;
+
+        particles.forEach((particle, index) => {
+            const speed = (index + 1) * 0.05;
+            particle.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px)`;
+        });
+    });
+
+    // Enhanced Intersection Observer
+    const observerOptions = {
+        threshold: 0.2,
+        rootMargin: '0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe gallery items
+    document.querySelectorAll('.gallery-item').forEach(el => {
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

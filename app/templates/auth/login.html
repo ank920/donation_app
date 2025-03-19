@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+        </div>
+        <div class="login-form">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="form-floating mb-3">
+                    {{ form.email(class="form-control", id="email", placeholder="name@example.com") }}
+                    <label for="email">Email address</label>
+                    {% for error in form.email.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ form.password(class="form-control", id="password", placeholder="Password") }}
+                    <label for="password">Password</label>
+                    {% for error in form.password.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                    <div class="mt-1">
+                        <a href="{{ url_for('auth.reset_password_request') }}" class="text-primary text-decoration-none">
+                            <small>Forgot Password?</small>
+                        </a>
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    {{ form.remember_me(class="form-check-input", id="remember_me") }}
+                    {{ form.remember_me.label(class="form-check-label", for="remember_me") }}
+                </div>
+                {{ form.submit(class="btn btn-login") }}
+            </form>
+            <div class="register-link mt-3">
+                <p class="mb-0">New User? <a href="{{ url_for('auth.register') }}" class="text-primary">Create Account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="register-container">
+    <!-- Floating particles -->
+    <div class="register-particles">
+        <div class="register-particle"></div>
+        <div class="register-particle"></div>
+        <div class="register-particle"></div>
+        <div class="register-particle"></div>
+        <div class="register-particle"></div>
+    </div>
+    
+    <div class="register-card">
+        <div class="register-header">
+            <h1>Join Our Community</h1>
+        </div>
+        <div class="register-form">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.username.label(class="form-label", style="--i: 1") }}
+                        {{ form.username(class="form-control", style="--i: 1") }}
+                        {% for error in form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.email.label(class="form-label", style="--i: 2") }}
+                        {{ form.email(class="form-control", style="--i: 2") }}
+                        {% for error in form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.password.label(class="form-label", style="--i: 3") }}
+                        {{ form.password(class="form-control", style="--i: 3") }}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.password2.label(class="form-label", style="--i: 4") }}
+                        {{ form.password2(class="form-control", style="--i: 4") }}
+                        {% for error in form.password2.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.user_type.label(class="form-label", style="--i: 5") }}
+                    {{ form.user_type(class="form-select", style="--i: 5") }}
+                    {% for error in form.user_type.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.organization_name.label(class="form-label", style="--i: 6") }}
+                    {{ form.organization_name(class="form-control", style="--i: 6") }}
+                    {% for error in form.organization_name.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.address.label(class="form-label", style="--i: 7") }}
+                    {{ form.address(class="form-control", rows=3, style="--i: 7") }}
+                    {% for error in form.address.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.phone.label(class="form-label", style="--i: 8") }}
+                    {{ form.phone(class="form-control", style="--i: 8") }}
+                    {% for error in form.phone.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-register") }}
+                </div>
+            </form>
+        </div>
+        <div class="register-card-footer">
+            <p class="mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Click to Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add mousemove effect to particles
+        const container = document.querySelector('.register-container');
+        const particles = document.querySelectorAll('.register-particle');
+        
+        container.addEventListener('mousemove', function(e) {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            particles.forEach(function(particle, index) {
+                // Create a unique movement for each particle
+                const offsetX = (index + 1) * 10 * (x - 0.5);
+                const offsetY = (index + 1) * 10 * (y - 0.5);
+                
+                particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            });
+        });
+        
+        // Add focus effects to form fields
+        const formControls = document.querySelectorAll('.form-control, .form-select');
+        
+        formControls.forEach(function(control) {
+            control.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            control.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+    });
+</script>
+{% endblock %} 

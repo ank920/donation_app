@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    .view-container {
+        padding: 4rem 0;
+        background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        min-height: 100vh;
+    }
+
+    .donation-header {
+        background: linear-gradient(45deg, #4169E1, #1e90ff);
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0 0 30px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .donation-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+    }
+
+    .donation-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .status-badge.bg-success {
+        background: linear-gradient(45deg, #28a745, #20c997) !important;
+    }
+
+    .status-badge.bg-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+    }
+
+    .status-badge.bg-secondary {
+        background: linear-gradient(45deg, #6c757d, #495057) !important;
+    }
+
+    .donation-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: none;
+    }
+
+    .donation-info {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .donation-info h5 {
+        color: #1a1a1a;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .donation-info p {
+        color: #666;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+
+    .donation-info ul {
+        margin-bottom: 2rem;
+    }
+
+    .donation-info li {
+        color: #444;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .donation-info li strong {
+        color: #1a1a1a;
+        min-width: 120px;
+    }
+
+    .donor-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .donor-card h5 {
+        color: #1a1a1a;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .donor-info {
+        color: #666;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-reserve {
+        background: linear-gradient(45deg, #4169E1, #1e90ff);
+        border: none;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        color: white;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-reserve:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(30, 144, 255, 0.3);
+        color: white;
+    }
+
+    .btn-edit {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        border: none;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(253, 126, 20, 0.3);
+    }
+
+    #map {
+        height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .location-actions {
+        margin-top: 2rem;
+    }
+
+    .btn-directions {
+        background: linear-gradient(45deg, #20c997, #28a745);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-directions:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(32, 201, 151, 0.3);
+        color: white;
+    }
+
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        background: linear-gradient(45deg, #4169E1, #1e90ff);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #f8f9fa;
+        padding: 1.5rem;
+    }
+
+    .alert-info {
+        background: linear-gradient(45deg, rgba(65, 105, 225, 0.1), rgba(30, 144, 255, 0.1));
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: #1a1a1a;
+    }
+
+    .alert-danger {
+        background: linear-gradient(45deg, rgba(220, 53, 69, 0.1), rgba(255, 71, 87, 0.1));
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: #dc3545;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .reservation-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 20px;
+        padding: 0;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -40%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .reservation-modal .modal-header {
+        background: linear-gradient(135deg, #1e88e5, #1a237e);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 20px 20px 0 0;
+        position: relative;
+        border: none;
+    }
+
+    .reservation-modal .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .reservation-modal .modal-title i {
+        font-size: 1.8rem;
+    }
+
+    .reservation-modal .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .reservation-modal .close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .reservation-modal .modal-body {
+        padding: 2rem;
+    }
+
+    .reservation-modal .donation-info {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .reservation-modal .donation-title {
+        color: #1a237e;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .reservation-modal .donation-details {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .reservation-modal .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #37474f;
+    }
+
+    .reservation-modal .detail-item i {
+        color: #1e88e5;
+        font-size: 1.1rem;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(30, 136, 229, 0.1);
+        border-radius: 6px;
+    }
+
+    .reservation-modal .terms {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: #fff3e0;
+        border-radius: 12px;
+        border-left: 4px solid #ff9800;
+    }
+
+    .reservation-modal .terms h6 {
+        color: #e65100;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .reservation-modal .terms ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #795548;
+    }
+
+    .reservation-modal .terms li {
+        margin-bottom: 0.5rem;
+    }
+
+    .reservation-modal .terms li:last-child {
+        margin-bottom: 0;
+    }
+
+    .reservation-modal .modal-footer {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .reservation-modal .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .reservation-modal .btn-cancel {
+        background: #f5f5f5;
+        color: #616161;
+        border: none;
+    }
+
+    .reservation-modal .btn-cancel:hover {
+        background: #eeeeee;
+        transform: translateY(-2px);
+    }
+
+    .reservation-modal .btn-confirm {
+        background: linear-gradient(135deg, #1e88e5, #1a237e);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba(30, 136, 229, 0.2);
+    }
+
+    .reservation-modal .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(30, 136, 229, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <div class="donation-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="donation-title">{{ donation.title }}</h1>
+                <span class="status-badge 
+                    {% if donation.status == 'available' %}bg-success
+                    {% elif donation.status == 'reserved' %}bg-warning
+                    {% else %}bg-secondary{% endif %}">
+                    {{ donation.status | title }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="donation-info">
+                    <h5>Description</h5>
+                    <p>{{ donation.description }}</p>
+                    
+                    <h5>Details</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="bi bi-box-seam-fill text-primary"></i>
+                            <strong>Quantity:</strong> {{ donation.quantity }}
+                        </li>
+                        <li>
+                            <i class="bi bi-star"></i>
+                            <strong>Condition:</strong> {{ donation.condition|title }}
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone"></i>
+                            <strong>Contact:</strong> {{ donation.contact_phone }}
+                        </li>
+                        <li>
+                            <i class="bi bi-clock-fill text-primary"></i>
+                            <strong>Expiry Time:</strong> {{ donation.expiry_time|format_datetime }}
+                        </li>
+                        {% if donation.reserved_at %}
+                        <li>
+                            <i class="bi bi-calendar-check-fill text-primary"></i>
+                            <strong>Reserved At:</strong> {{ donation.reserved_at|format_datetime }}
+                        </li>
+                        {% endif %}
+                        <li>
+                            <i class="bi bi-geo-alt-fill text-primary"></i>
+                            <strong>Location:</strong> {{ donation.pickup_location }}
+                        </li>
+                    </ul>
+
+                    <div id="map"></div>
+
+                    {% if current_user.is_authenticated and current_user.user_type == 'recipient' and donation.status == 'reserved' %}
+                    <div class="location-actions">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ donation.latitude }},{{ donation.longitude }}" 
+                           target="_blank"
+                           class="btn btn-directions">
+                            <i class="bi bi-map"></i> Get Directions
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="donor-card">
+                    <h5>Donor Information</h5>
+                    <div class="donor-info">
+                        <p><strong>Organization:</strong><br>
+                        {{ donation.donor.organization_name }}</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        {% if current_user.is_authenticated and current_user.user_type == 'recipient' and donation.status == 'available' %}
+                        <button type="button" class="btn btn-reserve" onclick="processReserveDonation()">
+                            <i class="bi bi-bookmark-check-fill"></i> Reserve Donation
+                        </button>
+                        {% endif %}
+
+                        {% if current_user.is_authenticated and current_user.id == donation.user_id and donation.status == 'available' %}
+                        <a href="{{ url_for('donations.edit', id=donation.id) }}" class="btn btn-reserve btn-edit">
+                            <i class="bi bi-pencil-fill"></i> Edit Donation
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Expired Donation Modal -->
+{% if is_expired %}
+<div class="modal fade show" id="expiredModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Donation Expired</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">This donation has expired!</h4>
+                <p class="text-muted">The expiry time for this donation has passed. It is no longer available for reservation.</p>
+                <button type="button" class="btn btn-reserve mt-4" onclick="returnToDashboard()">
+                    Return to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Get donation data from template variables
+const donationId = {{ donation.id }};
+const donationTitle = {{ donation.title | tojson | safe }};
+const donationLatitude = {{ donation.latitude | default(0) }};
+const donationLongitude = {{ donation.longitude | default(0) }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const latitude = donationLatitude;
+    const longitude = donationLongitude;
+
+    if (isNaN(latitude) || isNaN(longitude) || (latitude === 0 && longitude === 0)) {
+        console.error("Invalid or missing location coordinates.");
+        return;
+    }
+
+    const map = L.map('map').setView([latitude, longitude], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add custom marker with popup
+    const marker = L.marker([latitude, longitude], {
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: '<i class="bi bi-geo-alt-fill" style="color: #4169E1; font-size: 2rem;"></i>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+        })
+    }).addTo(map);
+
+    marker.bindPopup(`
+        <div style="text-align: center;">
+            <strong>${donationTitle}</strong><br>
+            {{ donation.pickup_location | tojson | safe }}
+        </div>
+    `);
+
+    // Handle expired donation modal
+    const isExpired = {{ is_expired | tojson }};
+    if (isExpired) {
+        const expiredModal = new bootstrap.Modal(document.getElementById('expiredModal'));
+        expiredModal.show();
+    }
+});
+
+function processReserveDonation() {
+    // Show loading state on button
+    const confirmBtn = document.querySelector('.btn-reserve');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    confirmBtn.disabled = true;
+
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // Make API call to reserve the donation
+    fetch(`/donations/${donationId}/reserve`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => Promise.reject(data));
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Success - show success message and redirect to dashboard
+        showAlert('success', data.message || 'Donation reserved successfully!');
+        setTimeout(() => {
+            window.location.href = '{{ url_for("main.dashboard") }}';
+        }, 1500);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show error message from server or default message
+        showAlert('danger', error.error || 'An error occurred while reserving the donation');
+        // Reset button
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+    });
+}
+
+function showAlert(type, message) {
+    // Create alert element with improved styling
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show`;
+    alert.style.position = 'fixed';
+    alert.style.top = '20px';
+    alert.style.left = '50%';
+    alert.style.transform = 'translateX(-50%)';
+    alert.style.zIndex = '9999';
+    alert.style.minWidth = '300px';
+    alert.style.maxWidth = '80%';
+    alert.style.textAlign = 'center';
+    alert.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    alert.style.borderRadius = '10px';
+    alert.style.animation = 'slideInDown 0.3s ease-out';
+    alert.style.padding = '1rem 2rem';
+
+    // Add icon based on alert type
+    const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+    alert.innerHTML = `
+        <i class="bi ${icon} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    // Add alert to body
+    document.body.appendChild(alert);
+
+    // Remove alert after 3 seconds
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 300);
+    }, 3000);
+}
+
+// Add animation keyframes
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInDown {
+        from {
+            transform: translate(-50%, -100%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+function returnToDashboard() {
+    window.location.href = '{{ url_for("main.dashboard") }}';
+}
+</script>
+{% endblock %}

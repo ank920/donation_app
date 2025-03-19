@@ -1,0 +1,673 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    body {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    /* Modern Hero Section */
+    .hero-section {
+        min-height: 80vh;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+    }
+
+    #vanta-hero {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        color: white;
+        position: relative;
+        z-index: 1;
+        padding: 2rem;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.95);
+        animation: fadeInUp 1s ease-out 0.2s backwards;
+    }
+
+    /* Modern Search Container */
+    .search-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1),
+                    inset 0 0 15px rgba(135, 206, 235, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .search-input {
+        border: 2px solid rgba(135, 206, 235, 0.3);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        padding-left: 2.5rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 0 10px rgba(135, 206, 235, 0.1);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: rgba(135, 206, 235, 0.6);
+        box-shadow: 0 0 10px rgba(74, 144, 226, 0.1),
+                    inset 0 0 15px rgba(135, 206, 235, 0.2);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #87CEEB;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 10px rgba(135, 206, 235, 0.3);
+    }
+
+    .search-input:focus + .search-icon {
+        color: #4A90E2;
+        text-shadow: 0 0 15px rgba(135, 206, 235, 0.5);
+    }
+
+    .search-input::placeholder {
+        color: #999;
+    }
+
+    .search-select {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        color: #333;
+        padding: 0.8rem 1.2rem;
+        border-radius: 0.5rem;
+        min-width: 180px;
+    }
+
+    .search-button {
+        background: #4a90e2;
+        border: none;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .search-button:hover {
+        background: #357abd;
+        transform: translateY(-2px);
+    }
+
+    /* Categories Section */
+    .categories-section {
+        padding: 4rem 0;
+        background: #fff;
+        position: relative;
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 3rem;
+        color: #333;
+        position: relative;
+    }
+
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .category-card {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid #eee;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.05));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: #4a90e2;
+        box-shadow: 0 8px 15px rgba(74, 144, 226, 0.15);
+    }
+
+    .category-card:hover::before {
+        opacity: 1;
+    }
+
+    .category-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1.2rem;
+        color: #4a90e2;
+        background: rgba(74, 144, 226, 0.1);
+        width: 80px;
+        height: 80px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.4s ease;
+    }
+
+    .category-card:hover .category-icon {
+        transform: scale(1.1);
+        background: #4a90e2;
+        color: #fff;
+    }
+
+    .category-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: #333;
+        transition: color 0.3s ease;
+    }
+
+    .category-card:hover .category-name {
+        color: #4a90e2;
+    }
+
+    .category-count {
+        color: #666;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .category-count i {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+
+    /* Donations Section */
+    .donations-section {
+        padding: 4rem 0;
+        background: #f8f9fa;
+    }
+
+    .donations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .donation-card {
+        background: linear-gradient(to bottom, #fff, rgba(135, 206, 235, 0.05));
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(74, 144, 226, 0.1),
+                    inset 0 0 15px rgba(135, 206, 235, 0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        position: relative;
+    }
+
+    .donation-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 1rem;
+        background: linear-gradient(to bottom, rgba(135, 206, 235, 0.02), rgba(135, 206, 235, 0.08));
+        box-shadow: 0 0 20px rgba(74, 144, 226, 0.2),
+                    inset 0 0 25px rgba(135, 206, 235, 0.15);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .donation-card:hover {
+        transform: translateY(-5px);
+        background: linear-gradient(to bottom, #fff, rgba(135, 206, 235, 0.1));
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.15),
+                    inset 0 0 20px rgba(135, 206, 235, 0.2);
+    }
+
+    .donation-card:hover::before {
+        opacity: 1;
+    }
+
+    .donation-content {
+        padding: 1.5rem;
+    }
+
+    .donation-category {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: #f0f7ff;
+        color: #4a90e2;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .donation-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .donation-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .donation-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .donation-donor {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .donor-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #f0f7ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4a90e2;
+    }
+
+    .donor-name {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .donation-date {
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .view-donation-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background: #f8f9fa;
+        color: #4a90e2;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        border-top: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+
+    .view-donation-btn:hover {
+        background: #4a90e2;
+        color: white;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.2rem;
+        }
+
+        .search-form {
+            flex-direction: column;
+        }
+
+        .search-select {
+            width: 100%;
+        }
+    }
+
+    mark {
+        background-color: rgba(74, 144, 226, 0.2);
+        color: inherit;
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+    
+    .related-matches {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .donation-card {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+    
+    .donation-card.animate-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div id="vanta-hero"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">Find & Share Donations</h1>
+        <p class="hero-subtitle">Connect with donors and recipients in your community. Make a difference today by sharing what you have or finding what you need.</p>
+        
+        <!-- Search Container -->
+        <div class="search-container">
+            <form class="search-form" id="searchForm">
+                <input type="text" class="search-input" placeholder="Search donations..." name="search" id="searchInput">
+                <select class="search-select" name="category" id="categorySelect">
+                    <option value="all">All Categories</option>
+                    <option value="food">Food</option>
+                    <option value="clothes">Clothes</option>
+                    <option value="pets">Pets</option>
+                    <option value="books">Books</option>
+                    <option value="toys">Toys</option>
+                    <option value="medical">Medical</option>
+                </select>
+                <button type="submit" class="search-button">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section">
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="category-grid">
+        {% for category, count in category_counts.items() %}
+        <div class="category-card" onclick="filterByCategory('{{ category }}')">
+            <div class="category-icon">
+                {% if category == 'food' %}
+                    <i class="bi bi-basket3-fill"></i>
+                {% elif category == 'clothes' %}
+                    <i class="bi bi-bag-heart-fill"></i>
+                {% elif category == 'pets' %}
+                    <i class="bi bi-heart-fill"></i>
+                {% elif category == 'books' %}
+                    <i class="bi bi-book-half"></i>
+                {% elif category == 'toys' %}
+                    <i class="bi bi-controller"></i>
+                {% elif category == 'medical' %}
+                    <i class="bi bi-hospital-fill"></i>
+                {% endif %}
+            </div>
+            <h3 class="category-name">{{ category.title() }}</h3>
+            <p class="category-count">
+                <i class="bi bi-box-seam"></i>
+                {{ count }} items available
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Donations Section -->
+<section class="donations-section">
+    <h2 class="section-title">Available Donations</h2>
+    <div class="donations-grid" id="donationsGrid">
+        {% for donation in donations %}
+        <a href="{{ url_for('donations.view', id=donation.id) }}" class="donation-card" style="text-decoration: none; color: inherit;">
+            <div class="donation-content">
+                <span class="donation-category">{{ donation.category.title() }}</span>
+                <h3 class="donation-title">{{ donation.title }}</h3>
+                <p class="donation-description">{{ donation.description[:100] }}...</p>
+                <div class="donation-meta">
+                    <div class="donation-donor">
+                        <div class="donor-avatar">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <span class="donor-name">{{ donation.donor.username }}</span>
+                    </div>
+                    <span class="donation-date">{{ donation.created_at|format_datetime }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Vanta.js NET effect with softer colors
+    VANTA.NET({
+        el: "#vanta-hero",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0x4a90e2,
+        backgroundColor: 0x2c3e50,
+        points: 12,
+        maxDistance: 25.00,
+        spacing: 18.00,
+        showDots: true
+    });
+
+    // Animate donation cards on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.donation-card').forEach(card => {
+        observer.observe(card);
+    });
+
+    // Handle search form submission
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchTerm = document.getElementById('searchInput').value;
+        const category = document.getElementById('categorySelect').value;
+        searchDonations(searchTerm, category);
+    });
+});
+
+function filterByCategory(category) {
+    document.getElementById('categorySelect').value = category;
+    searchDonations('', category);
+}
+
+function searchDonations(searchTerm, category) {
+    // Show loading state
+    const donationsGrid = document.getElementById('donationsGrid');
+    donationsGrid.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Searching donations...</p></div>';
+
+    // Fetch donations with enhanced search
+    fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&category=${category}`)
+        .then(response => response.json())
+        .then(donations => {
+            donationsGrid.innerHTML = '';
+            if (donations.length === 0) {
+                donationsGrid.innerHTML = `
+                    <div class="text-center">
+                        <i class="bi bi-search" style="font-size: 2rem; color: #999;"></i>
+                        <p class="mt-2">No donations found matching "${searchTerm}"</p>
+                        <p class="text-muted">Try using different keywords or check all categories</p>
+                    </div>`;
+                return;
+            }
+
+            // Sort donations by relevance (if there are matches)
+            donations.sort((a, b) => {
+                // Give more weight to title matches
+                const aMatches = a.matches || [];
+                const bMatches = b.matches || [];
+                
+                // Title matches get highest priority
+                if (aMatches.includes('title') && !bMatches.includes('title')) return -1;
+                if (!aMatches.includes('title') && bMatches.includes('title')) return 1;
+                
+                // Then sort by number of matches
+                return bMatches.length - aMatches.length;
+            });
+
+            donations.forEach(donation => {
+                const card = createDonationCard(donation, searchTerm);
+                donationsGrid.appendChild(card);
+            });
+
+            // Add summary of search results
+            const searchSummary = document.createElement('div');
+            searchSummary.className = 'text-center mb-4';
+            searchSummary.innerHTML = `
+                <p class="text-muted">
+                    Found ${donations.length} donation${donations.length !== 1 ? 's' : ''} 
+                    ${searchTerm ? `matching "${searchTerm}"` : ''}
+                    ${category !== 'all' ? `in category "${category}"` : ''}
+                </p>
+            `;
+            donationsGrid.insertBefore(searchSummary, donationsGrid.firstChild);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            donationsGrid.innerHTML = `
+                <div class="text-center text-danger">
+                    <i class="bi bi-exclamation-circle" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Error loading donations</p>
+                </div>`;
+        });
+}
+
+// Add this function at the beginning of your script section to get base URL
+function getBaseUrl() {
+    return window.location.protocol + '//' + window.location.host;
+}
+
+function createDonationCard(donation, searchTerm) {
+    const card = document.createElement('a');
+    card.className = 'donation-card';
+    card.href = `${getBaseUrl()}/donations/view/${donation.id}`;
+    card.style.textDecoration = 'none';
+    card.style.color = 'inherit';
+
+    // Highlight matching text if there's a search term
+    let description = donation.description;
+    let title = donation.title;
+    
+    if (searchTerm && searchTerm.length > 0) {
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        description = description.replace(regex, '<mark>$1</mark>');
+        title = title.replace(regex, '<mark>$1</mark>');
+    }
+
+    // Show related matches if any
+    let relatedMatchesHtml = '';
+    if (donation.related_matches && donation.related_matches.length > 0) {
+        relatedMatchesHtml = `
+            <div class="related-matches">
+                <small class="text-muted">
+                    Related terms: ${donation.related_matches.join(', ')}
+                </small>
+            </div>`;
+    }
+
+    card.innerHTML = `
+        <div class="donation-content">
+            <span class="donation-category">${donation.category.charAt(0).toUpperCase() + donation.category.slice(1)}</span>
+            <h3 class="donation-title">${title}</h3>
+            <p class="donation-description">${description.substring(0, 150)}...</p>
+            ${relatedMatchesHtml}
+            <div class="donation-meta">
+                <div class="donation-donor">
+                    <div class="donor-avatar">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <span class="donor-name">${donation.donor_name}</span>
+                </div>
+                <span class="donation-date">${new Date(donation.created_at).toLocaleDateString()}</span>
+            </div>
+        </div>
+    `;
+
+    // Add animation class after a brief delay
+    setTimeout(() => card.classList.add('animate-visible'), 100);
+
+    return card;
+}
+</script>
+{% endblock %}
